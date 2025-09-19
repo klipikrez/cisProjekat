@@ -1,0 +1,54 @@
+version: "3.9"
+
+# Ime projekta
+name: ${APP_NAME}
+
+services:
+  frontend:
+    container_name: ${APP_NAME_FRONTEND}
+    build:
+      context: ./ModniSajt
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./ModniSajt/src:/app/src # mount source kod radi hot-reload-a
+      - app_message:/app/message
+    networks:
+      - app_network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - backend
+
+  backend:
+    container_name: ${APP_NAME_BACKEND}
+    build:
+      context: ./ProjekatBackend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - app_network
+    restart: always 
+    healthcheck:
+      test: ["CMD", "powershell", "-Command", "Invoke-WebRequest http://localhost:5000/health -UseBasicParsing"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+# Mreža
+networks:
+  app_network:
+    driver: bridge
+
+# Volumi
+volumes:
+  app_message:
+    driver: local

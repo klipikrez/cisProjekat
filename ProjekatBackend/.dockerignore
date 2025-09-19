@@ -1,0 +1,10 @@
+bin/
+obj/
+*.csproj.user
+*.dll
+*.pdb
+*.log
+*.tmp
+*.lock.json
+node_modules/
+.env
